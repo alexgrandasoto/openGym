@@ -15,9 +15,10 @@ const HEAVY = EXDB.find(e => e.bp === 'upper legs').id
 const CARDIO = EXDB.find(e => e.bp === 'cardio').id
 
 // Build a state whose history is a list of sessions given as [weight, ...repsPerSet].
-// A rep count of null means "the set was never checked off".
+// A rep count of null means "the set was never checked off". These tests read the rules with
+// the sets moving together; progression.all-failure.test.js covers each set on its own.
 const hist = (id, rows, target) => ({
-  unit: 'kg',
+  unit: 'kg', setsMove: 'together',
   workouts: rows.map((row, i) => ({
     d: '2026-01-0' + (i + 1),
     entries: [{
@@ -838,6 +839,64 @@ describe('an edited plan restarts progression (#275)', () => {
   })
 })
 
+// A workout brought in from Hevy or another app has no openGym routine id. It still belongs to
+// the routine it was performed from, and a copy of that routine keeps the same line, so the
+// next session can say to add weight or to back off instead of starting as a brand new routine.
+describe('imported routine history', () => {
+  const hit = (over = {}) => ({
+    d: '2026-05-01', routineId: null, name: 'Push', ...over,
+    entries: [{ id: LIFT, sets: [{ w: 60, r: 10, done: true }, { w: 60, r: 10, done: true }] }],
+  })
+  const routine = (id, extra = {}) => ({ id, name: 'Push', ex: [{ id: LIFT, sets: 2, reps: 10, weight: 60 }], ...extra })
+  const cfg = { id: LIFT, sets: 2, reps: 10, weight: 60, prog: 'linear' }
+
+  it('raises the weight off a session whose name is the routine\'s', () => {
+    const S = { unit: 'kg', routines: [routine('push')], workouts: [hit()] }
+    const p = nextPrescription(S, cfg, S.routines[0])
+    expect(p).toMatchObject({ kind: 'up', weight: 62.5 })
+    expect(p.why[0]).toBe('Every rep last time. {0} {1} more.')
+  })
+
+  it('backs off when that session missed the routine\'s reps', () => {
+    const missed = hit()
+    missed.entries[0].sets = [{ w: 60, r: 6, done: true }, { w: 60, r: 6, done: true }]
+    const S = { unit: 'kg', routines: [routine('push')], workouts: [missed, missed, missed] }
+    const p = nextPrescription(S, cfg, S.routines[0])
+    expect(p.kind).toBe('deload')
+    expect(p.why[0]).not.toBe('First time in this routine, so starting from its own target.')
+  })
+
+  it('follows Hevy\'s routine id when the workout was renamed', () => {
+    const S = {
+      unit: 'kg',
+      routines: [routine('push', { hevyId: 'hv-push', name: 'Push day' })],
+      workouts: [hit({ name: 'Monday', hevyRoutineId: 'hv-push' })],
+    }
+    expect(nextPrescription(S, cfg, S.routines[0])).toMatchObject({ kind: 'up', weight: 62.5 })
+  })
+
+  it('does not attach a session when two routines share its name', () => {
+    const S = { unit: 'kg', routines: [routine('a'), routine('b')], workouts: [hit()] }
+    const p = nextPrescription(S, cfg, S.routines[0])
+    expect(p.why[0]).toBe('First time in this routine, so starting from its own target.')
+  })
+
+  it('keeps the same advice on a copy, and starts over once the copy\'s reps change', () => {
+    const S = { unit: 'kg', routines: [routine('push'), { ...routine('copy'), name: 'Push (Copy)', copiedFrom: 'push' }], workouts: [hit()] }
+    expect(nextPrescription(S, cfg, S.routines[1])).toMatchObject({ kind: 'up', weight: 62.5 })
+    const edited = { id: LIFT, sets: 2, reps: 5, weight: 60, prog: 'linear' }
+    S.routines[1].ex = [{ ...edited }]
+    const p = nextPrescription(S, edited, S.routines[1])
+    expect(p.why[0]).toBe('First time in this routine, so starting from its own target.')
+    expect(p).toMatchObject({ kind: 'hold', reps: 5 })
+  })
+
+  it('still reads those sessions when only the copy is left', () => {
+    const S = { unit: 'kg', routines: [{ ...routine('copy'), name: 'Push (Copy)' }], workouts: [hit()] }
+    expect(nextPrescription(S, cfg, S.routines[0])).toMatchObject({ kind: 'up', weight: 62.5 })
+  })
+})
+
 // "Excluded from progression" is per-entry now (ENG-11): a rehab routine combined with real
 // work must exclude only its own exercises, not the whole session.
 describe('per-entry noProg (combine routines)', () => {
@@ -934,7 +993,7 @@ describe('per-entry noProg (combine routines)', () => {
 // their first session after updating — which is exactly what the demo history did.
 describe('history logged before targets were recorded', () => {
   const legacy = rows => ({
-    unit: 'kg',
+    unit: 'kg', setsMove: 'together',
     workouts: rows.map((row, i) => ({
       d: '2026-03-' + String(i + 1).padStart(2, '0'),
       entries: [{ id: LIFT, sets: row.slice(1).map(r => ({ w: row[0], r, done: true })) }]   // no target

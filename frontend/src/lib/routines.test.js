@@ -76,6 +76,16 @@ describe('copyRoutine', () => {
     expect(copy.name).toBe('Empty (Copy)')
     expect(copy.id).not.toBe('r2')
   })
+
+  it('remembers which routine it was copied from, and leaves the import identity on the original', () => {
+    const source = { ...routine, hevyId: 'hv', importKey: 'liftosaur|p|0' }
+    const copy = copyRoutine(source)
+    expect(copy.copiedFrom).toBe('r1')
+    expect(copy.hevyId).toBeUndefined()
+    expect(copy.importKey).toBeUndefined()
+    expect(source.hevyId).toBe('hv')
+    expect(source.importKey).toBe('liftosaur|p|0')
+  })
 })
 
 describe('copyRoutine of a copy', () => {

@@ -3655,4 +3655,15 @@ export default {
   "Your webhooks stop sending while Integrations is off. They stay set up.": "'연동'이 꺼져 있는 동안 웹훅이 전송되지 않아요. 설정은 그대로예요.",
   "{0} of {1} modules on.": "모듈 {1}개 중 {0}개 켜짐.",
   "{0} stops syncing while Health is off. Nothing is disconnected, and it catches up once Health is back.": "'건강'이 꺼져 있는 동안 {0} 동기화가 멈춰요. 연결은 끊기지 않고, '건강'을 다시 켜면 밀린 걸 따라잡아요.",
+  // --- all sets to failure, per-set progression ---
+  "All sets to failure": "모든 세트 실패 지점까지",
+  "Every set goes until nothing is left, and each set moves on its own: more reps, then more weight.": "모든 세트를 더 이상 못 할 때까지 하고, 세트마다 따로 늘어요: 먼저 반복 수, 그다음 무게.",
+  "Plan every set as an all-out one.": "모든 세트를 전력 세트로 계획해요.",
+  "Each set on its own: more reps until it reaches {0}, then more weight.": "세트마다 따로: {0}회에 닿을 때까지 반복 수를 늘리고, 그다음 무게를 올려요.",
+  "A set stuck for {0} sessions goes lighter. The other sets move on their own.": "{0}세션째 멈춘 세트는 가벼워져요. 다른 세트는 따로 늘어요.",
+  "Sets progress": "세트 진행",
+  "Each set on its own": "세트마다 따로",
+  "A set that reached its reps goes up. The others keep building at their own weight.": "목표 횟수에 도달한 세트는 무게가 오릅니다. 나머지는 각자의 무게에서 계속 쌓아갑니다.",
+  "All together": "모두 함께",
+  "All sets share one weight and go up when every set made its reps.": "모든 세트가 같은 무게를 쓰고, 모든 세트가 목표 횟수를 채우면 무게가 오릅니다.",
 }

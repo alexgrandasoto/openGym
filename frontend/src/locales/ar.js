@@ -3710,4 +3710,15 @@ export default {
   "Your webhooks stop sending while Integrations is off. They stay set up.": "لا يرسل الويب هوك شيئًا ما دامت «التكاملات» متوقفة. يبقى مُعدًّا.",
   "{0} of {1} modules on.": "{0} من {1} وحدات مفعّلة.",
   "{0} stops syncing while Health is off. Nothing is disconnected, and it catches up once Health is back.": "يتوقف {0} عن المزامنة ما دامت «الصحة» متوقفة. لا يُفصل شيء، ويلحق بكل شيء عند عودة «الصحة».",
+  // --- all sets to failure, per-set progression ---
+  "All sets to failure": "كل المجموعات حتى الفشل",
+  "Every set goes until nothing is left, and each set moves on its own: more reps, then more weight.": "كل مجموعة تستمر حتى لا يبقى شيء، وكل مجموعة تتقدم وحدها: تكرارات أكثر ثم وزن أكبر.",
+  "Plan every set as an all-out one.": "خطط لكل مجموعة كمجهود كامل.",
+  "Each set on its own: more reps until it reaches {0}, then more weight.": "كل مجموعة وحدها: تكرارات أكثر حتى تصل إلى {0}، ثم وزن أكبر.",
+  "A set stuck for {0} sessions goes lighter. The other sets move on their own.": "مجموعة متوقفة منذ {0} جلسات تصبح أخف. المجموعات الأخرى تتقدم وحدها.",
+  "Sets progress": "تقدم المجموعات",
+  "Each set on its own": "كل مجموعة وحدها",
+  "A set that reached its reps goes up. The others keep building at their own weight.": "المجموعة التي وصلت إلى تكراراتها يزيد وزنها. والبقية تواصل البناء بوزنها.",
+  "All together": "كلها معًا",
+  "All sets share one weight and go up when every set made its reps.": "كل المجموعات بوزن واحد، ويزيد حين تصل كل مجموعة إلى تكراراتها.",
 }

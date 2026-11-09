@@ -3655,4 +3655,15 @@ export default {
   "Your webhooks stop sending while Integrations is off. They stay set up.": "“Entegrasyonlar” kapalıyken webhook'ların bir şey göndermez. Kurulu kalırlar.",
   "{0} of {1} modules on.": "{1} modülden {0} tanesi açık.",
   "{0} stops syncing while Health is off. Nothing is disconnected, and it catches up once Health is back.": "“Sağlık” kapalıyken {0} eşitlemeyi durdurur. Hiçbir bağlantı kesilmez, “Sağlık” geri gelince her şeyi yakalar.",
+  // --- all sets to failure, per-set progression ---
+  "All sets to failure": "Tüm setler tükenişe kadar",
+  "Every set goes until nothing is left, and each set moves on its own: more reps, then more weight.": "Her set hiçbir şey kalmayana kadar sürer ve her set kendi başına ilerler: önce tekrar, sonra ağırlık.",
+  "Plan every set as an all-out one.": "Her seti tam güçle planla.",
+  "Each set on its own: more reps until it reaches {0}, then more weight.": "Her set kendi başına: {0} tekrara ulaşana kadar tekrar artar, sonra ağırlık.",
+  "A set stuck for {0} sessions goes lighter. The other sets move on their own.": "{0} antrenmandır takılan bir set hafifler. Diğer setler kendi başına ilerler.",
+  "Sets progress": "Setlerin ilerlemesi",
+  "Each set on its own": "Her set kendi başına",
+  "A set that reached its reps goes up. The others keep building at their own weight.": "Tekrarlarına ulaşan set ağırlaşır. Diğerleri kendi ağırlıklarında gelişmeye devam eder.",
+  "All together": "Hepsi birlikte",
+  "All sets share one weight and go up when every set made its reps.": "Tüm setler tek ağırlıkla yapılır ve her set tekrarlarına ulaşınca ağırlık artar.",
 }

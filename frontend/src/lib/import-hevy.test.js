@@ -164,12 +164,26 @@ describe('parseHevyWorkouts', () => {
     const parsed = parseHevyWorkouts([a, b], TEMPLATES, { unit: 'kg' })
     expect(parsed.workouts).toHaveLength(2)
     expect(parsed.workouts.map(w => w.name)).toEqual(['AM', 'PM'])
+    expect(parsed.workouts[0].hevyRoutineId).toBeUndefined()
     expect(parsed.workouts[0].id).not.toBe(parsed.workouts[1].id)
     // Both arrive once; the same payload again adds nothing.
     const S = { workouts: [], customEx: [], exWeights: {}, bodyweight: [] }
     expect(mergeImport(S, parsed).added).toBe(2)
     expect(mergeImport(S, parsed).added).toBe(0)
     expect(S.workouts).toHaveLength(2)
+  })
+
+  it('keeps the Hevy routine the workout was started from, without changing its id', () => {
+    const parsed = parseHevyWorkouts([{ ...WORKOUT, routine_id: '  hv-push  ' }], TEMPLATES, { unit: 'kg' })
+    expect(parsed.workouts[0].hevyRoutineId).toBe('hv-push')
+    expect(parsed.workouts[0].routineId).toBeNull()
+    const again = parseHevyWorkouts([WORKOUT], TEMPLATES, { unit: 'kg' })
+    expect(parsed.workouts[0].id).toBe(again.workouts[0].id)
+    const S = { workouts: [], customEx: [], exWeights: {}, bodyweight: [] }
+    mergeImport(S, again)
+    expect(S.workouts[0].hevyRoutineId).toBeUndefined()
+    expect(mergeImport(S, parsed)).toEqual({ added: 0, skipped: 1 })
+    expect(S.workouts[0].hevyRoutineId).toBe('hv-push')
   })
 })
 

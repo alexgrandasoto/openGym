@@ -3652,4 +3652,15 @@ export default {
   "Your webhooks stop sending while Integrations is off. They stay set up.": "Поки «Інтеграції» вимкнено, твої вебхуки нічого не надсилають. Вони лишаються налаштованими.",
   "{0} of {1} modules on.": "Увімкнено модулів: {0} з {1}.",
   "{0} stops syncing while Health is off. Nothing is disconnected, and it catches up once Health is back.": "Поки «Здоров'я» вимкнено, {0} не синхронізується. Нічого не від’єднується, і все наздожене, щойно «Здоров'я» повернеться.",
+  // --- all sets to failure, per-set progression ---
+  "All sets to failure": "Усі підходи до відмови",
+  "Every set goes until nothing is left, and each set moves on its own: more reps, then more weight.": "Кожен підхід до повної відмови, і кожен росте сам по собі: більше повторень, потім більша вага.",
+  "Plan every set as an all-out one.": "Плануй кожен підхід на максимум.",
+  "Each set on its own: more reps until it reaches {0}, then more weight.": "Кожен підхід сам по собі: більше повторень, доки не дійде до {0}, потім більша вага.",
+  "A set stuck for {0} sessions goes lighter. The other sets move on their own.": "Підхід без прогресу вже стільки тренувань поспіль: {0}. Він стає легшим, інші ростуть самі по собі.",
+  "Sets progress": "Прогрес підходів",
+  "Each set on its own": "Кожен підхід окремо",
+  "A set that reached its reps goes up. The others keep building at their own weight.": "Підхід, що дійшов до своїх повторень, стає важчим. Решта росте на своїй вазі.",
+  "All together": "Усі разом",
+  "All sets share one weight and go up when every set made its reps.": "Усі підходи з однією вагою, яка росте, коли кожен підхід виконав свої повторення.",
 }

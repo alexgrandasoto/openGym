@@ -3702,4 +3702,15 @@ export default {
   "Your webhooks stop sending while Integrations is off. They stay set up.": "Dina webhooks skickar inget medan ”Integrationer” är av. De förblir inställda.",
   "{0} of {1} modules on.": "{0} av {1} moduler på.",
   "{0} stops syncing while Health is off. Nothing is disconnected, and it catches up once Health is back.": "{0} slutar synka medan ”Hälsa” är av. Inget kopplas bort, och allt kommer ikapp när ”Hälsa” är tillbaka.",
+  // --- all sets to failure, per-set progression ---
+  "All sets to failure": "Alla set till failure",
+  "Every set goes until nothing is left, and each set moves on its own: more reps, then more weight.": "Varje set körs tills inget finns kvar, och varje set går framåt för sig: fler reps, sedan mer vikt.",
+  "Plan every set as an all-out one.": "Planera varje set som ett maxset.",
+  "Each set on its own: more reps until it reaches {0}, then more weight.": "Varje set för sig: fler reps tills det når {0}, sedan mer vikt.",
+  "A set stuck for {0} sessions goes lighter. The other sets move on their own.": "Ett set som stått still i {0} pass blir lättare. De andra går framåt för sig.",
+  "Sets progress": "Hur seten ökar",
+  "Each set on its own": "Varje set för sig",
+  "A set that reached its reps goes up. The others keep building at their own weight.": "Ett set som klarar sina reps går upp i vikt. De andra fortsätter bygga på sin egen vikt.",
+  "All together": "Alla tillsammans",
+  "All sets share one weight and go up when every set made its reps.": "Alla set har samma vikt, som går upp när varje set klarat sina reps.",
 }

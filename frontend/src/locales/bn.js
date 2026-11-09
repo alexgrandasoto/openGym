@@ -3734,4 +3734,15 @@ export default {
   "Your webhooks stop sending while Integrations is off. They stay set up.": "\"ইন্টিগ্রেশন\" বন্ধ থাকলে আপনার ওয়েবহুক কিছু পাঠায় না। সেগুলো সেট আপ করাই থাকে।",
   "{0} of {1} modules on.": "{1}টির মধ্যে {0}টি মডিউল চালু।",
   "{0} stops syncing while Health is off. Nothing is disconnected, and it catches up once Health is back.": "\"স্বাস্থ্য\" বন্ধ থাকলে {0} সিঙ্ক বন্ধ রাখে। কিছুই বিচ্ছিন্ন হয় না, আর \"স্বাস্থ্য\" ফিরলেই সব পুষিয়ে নেয়।",
+  // --- all sets to failure, per-set progression ---
+  "All sets to failure": "সব সেট ফেইলিওর পর্যন্ত",
+  "Every set goes until nothing is left, and each set moves on its own: more reps, then more weight.": "প্রতিটি সেট চলে যতক্ষণ না কিছু বাকি থাকে, আর প্রতিটি সেট নিজের মতো এগোয়: আগে বেশি রেপ, তারপর বেশি ওজন।",
+  "Plan every set as an all-out one.": "প্রতিটি সেট পুরো শক্তির সেট হিসেবে পরিকল্পনা করুন।",
+  "Each set on its own: more reps until it reaches {0}, then more weight.": "প্রতিটি সেট নিজের মতো: {0} পর্যন্ত বেশি রেপ, তারপর বেশি ওজন।",
+  "A set stuck for {0} sessions goes lighter. The other sets move on their own.": "{0} সেশন ধরে আটকে থাকা সেট হালকা হয়। বাকি সেট নিজের মতো এগোয়।",
+  "Sets progress": "সেটের অগ্রগতি",
+  "Each set on its own": "প্রতিটি সেট নিজের মতো",
+  "A set that reached its reps goes up. The others keep building at their own weight.": "যে সেট তার রেপে পৌঁছেছে তার ওজন বাড়ে। বাকিরা নিজের ওজনে এগোতে থাকে।",
+  "All together": "সব একসাথে",
+  "All sets share one weight and go up when every set made its reps.": "সব সেট এক ওজনে, আর প্রতিটি সেট রেপে পৌঁছালে ওজন বাড়ে।",
 }

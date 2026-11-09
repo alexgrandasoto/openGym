@@ -3655,4 +3655,15 @@ export default {
   "Your webhooks stop sending while Integrations is off. They stay set up.": "“集成”关闭期间，你的 Webhook 不会发送。设置仍然保留。",
   "{0} of {1} modules on.": "已开启 {0}/{1} 个模块。",
   "{0} stops syncing while Health is off. Nothing is disconnected, and it catches up once Health is back.": "“健康”关闭期间，{0} 会停止同步。不会断开任何连接，“健康”重新开启后会自动补上。",
+  // --- all sets to failure, per-set progression ---
+  "All sets to failure": "所有组做到力竭",
+  "Every set goes until nothing is left, and each set moves on its own: more reps, then more weight.": "每组都做到一点不剩，每组各自进步：先加次数，再加重量。",
+  "Plan every set as an all-out one.": "把每组都计划成全力组。",
+  "Each set on its own: more reps until it reaches {0}, then more weight.": "每组各自进步：次数加到 {0}，再加重量。",
+  "A set stuck for {0} sessions goes lighter. The other sets move on their own.": "连续 {0} 次训练停滞的那组会减轻重量。其他组各自进步。",
+  "Sets progress": "组的进步方式",
+  "Each set on its own": "每组各自进步",
+  "A set that reached its reps goes up. The others keep building at their own weight.": "达到次数的那组加重量。其他组继续用自己的重量积累。",
+  "All together": "所有组一起",
+  "All sets share one weight and go up when every set made its reps.": "所有组用同一个重量，每组都达到次数后再加重。",
 }

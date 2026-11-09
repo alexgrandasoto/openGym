@@ -249,10 +249,12 @@ export function parseHevyWorkouts(workouts, templates, { unit = 'kg', customEx =
     // One workout per Hevy workout, not per day: a morning and an evening session stay two (#505).
     const key = w.id != null ? 'id|' + w.id : start.d + '|' + start.t + '|' + title
     let day = byDate.get(key)
+    const hevyRoutineId = typeof w.routine_id === 'string' && w.routine_id.trim() ? w.routine_id.trim() : ''
     if (!day) {
-      day = { d: start.d, ex: new Map(), name: title, start: start.t, end: end?.t ?? null }
+      day = { d: start.d, ex: new Map(), name: title, start: start.t, end: end?.t ?? null, hevyRoutineId }
       byDate.set(key, day)
     } else if (!day.name && title) day.name = title
+    if (hevyRoutineId && !day.hevyRoutineId) day.hevyRoutineId = hevyRoutineId
     // Past midnight the end's clock restarts; count it from the start day's midnight instead.
     if (end?.t != null) day.end = end.t + daysBetween(start.d, end.d) * 86400000
 
@@ -311,8 +313,11 @@ export function parseHevyWorkouts(workouts, templates, { unit = 'kg', customEx =
     const endMs = day.end != null ? base + day.end : startMs
     const workout = {
       // From what it is (importId), so the same import on two devices merges into one.
+      // `hevyRoutineId` is not part of that id: filling it in on a later import must match
+      // the workout already stored. Progression reads it against the routine's `hevyId`.
       id: importId('iw', JSON.stringify(['Hevy', d, startMs, day.name || '', entries.map(e => [e.id, e.sets])])), d, start: startMs, end: endMs > startMs ? endMs : startMs,
       routineId: null, name: day.name || 'Imported', entries, prs: [],
+      ...(day.hevyRoutineId ? { hevyRoutineId: day.hevyRoutineId } : {}),
     }
     // Work sets only, the number `workoutVolume` gives a workout finished in the app; it is stored for good.
     workout.vol = entries.reduce((a, e) => a + e.sets.reduce((b, s) => b + (isWarmupRow(s) ? 0 : (s.w || 0) * (s.r || 0)), 0), 0)

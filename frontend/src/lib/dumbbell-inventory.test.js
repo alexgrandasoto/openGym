@@ -150,7 +150,7 @@ describe('progression over owned dumbbells', () => {
     expect(RACK).toContain(g.weight)
     expect(g.weight).toBe(19)
     // Linear's Epley deload after three stalls picks its candidates from the list too.
-    const lin = state(['2026-10-01', '2026-10-03', '2026-10-05'].map(d => session(d, CURL, 21, [8, 5])))
+    const lin = state(['2026-10-01', '2026-10-03', '2026-10-05'].map(d => session(d, CURL, 21, [8, 5])), { setsMove: 'together' })
     const l = nextPrescription(lin, cfg(CURL), null)
     expect(l.kind).toBe('deload')
     expect(RACK).toContain(l.weight)
@@ -167,7 +167,7 @@ describe('progression over owned dumbbells', () => {
 
 describe('warm-ups and drops over owned dumbbells', () => {
   it('ramps the warm-up onto the heaviest bell under the rung', () => {
-    const S = state([session('2026-10-01', CURL, 21, [8, 6])])
+    const S = state([session('2026-10-01', CURL, 21, [8, 6])], { setsMove: 'together' })
     const built = buildPlannedEntry(S, cfg(CURL, { warmupSets: 1 }), null)
     const warm = built.sets.find(s => s.phase === 'warmup')
     expect(built.sets.at(-1).w).toBe(21)

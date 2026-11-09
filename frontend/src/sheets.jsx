@@ -2083,7 +2083,7 @@ function ProgressionFields({ ex, mode, c, setC, routine, unit, perSide, bw, fall
   // (Workout.jsx openProgressionSettings). It said "Follow the routine (Linear progression)".
   const active = freestyle === 'add' || (freestyle && !c.prog) ? 'off' : policyFor({ ...c, id: ex.id }, routine, mode, fallback)
   const inc = progressionStepOf(c, mode, ex, unit)
-  const canBackoff = backoffOffered(c, mode, ex, bw)
+  const canBackoff = backoffOffered(c, mode, ex, bw) && c.allToFailure !== true
   const backoff = canBackoff && c.backoff === true
   const weightless = weightlessOf(c, mode, bw)
   const invalid = !progressionStepIsValid(inc, active, backoff, weightless)
@@ -2364,7 +2364,10 @@ function ExConfig({ ex, existing, onSave, onDelete, onReplace, close, routine, i
       // Back-off sets: written only when on, and only where the sheet offered them.
       if (c.backoff === true && backoffOffered(out, 'reps', ex, bw) && isBackoff({ ...out, backoff: true })) out.backoff = true
       // A pyramid has its own Max set for this, so the flag is not offered (or kept) there.
-      if (!list.length) Object.assign(out, withFailure)
+      if (!list.length && c.allToFailure === true) {
+        out.allToFailure = true
+        delete out.backoff
+      } else if (!list.length) Object.assign(out, withFailure)
       saveAs(out)
     }
   }
@@ -2596,10 +2599,17 @@ function ExConfig({ ex, existing, onSave, onDelete, onReplace, close, routine, i
       </Row>}
       {/* Off keeps the list as `pyramidDraft`, so a stray tap does not lose it before Save
           (save writes neither field unless the toggle is on). */}
+      {/* Every work set to failure, and each set progresses on its own (progression.js perSetOf):
+          a later set is not held to what the first one did. Back-off sets step the sets down
+          from the first together, which is the other way round, so turning this on drops them. */}
+      {!pyramid && mode === 'reps' && <Row icon="gauge" iconTint="var(--purple)" title={t('All sets to failure')}
+        subtitle={c.allToFailure ? t('Every set goes until nothing is left, and each set moves on its own: more reps, then more weight.') : t('Plan every set as an all-out one.')}>
+        <Switch checked={c.allToFailure === true} onChange={v => setC(x => ({ ...x, allToFailure: v || undefined, ...(v ? { backoff: undefined } : {}) }))} />
+      </Row>}
       {/* The last work set of every session is marked as taken to failure, like Greyskull's
           final AMRAP set (workout-model isFailureSet, history.js applyFailurePlan). A pyramid
           already has its Max set for that. */}
-      {!pyramid && <Row icon="gauge" iconTint="var(--purple)" title={t('Last set to failure')}
+      {!pyramid && !(mode === 'reps' && c.allToFailure === true) && <Row icon="gauge" iconTint="var(--purple)" title={t('Last set to failure')}
         subtitle={c.lastToFailure ? t('The last set goes until nothing is left, and counts as all-out effort unless you rate it.') : t('Plan the final set as an all-out one.')}>
         <Switch checked={c.lastToFailure === true} onChange={v => setC(x => ({ ...x, lastToFailure: v || undefined }))} />
       </Row>}

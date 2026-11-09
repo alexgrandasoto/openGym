@@ -3658,4 +3658,15 @@ export default {
   "Your webhooks stop sending while Integrations is off. They stay set up.": "Amíg az „Integrációk” ki vannak kapcsolva, a webhookjaid nem küldenek semmit. Beállítva maradnak.",
   "{0} of {1} modules on.": "{1} modulból {0} bekapcsolva.",
   "{0} stops syncing while Health is off. Nothing is disconnected, and it catches up once Health is back.": "Amíg az „Egészség” ki van kapcsolva, a(z) {0} nem szinkronizál. A kapcsolat megmarad, és mindent bepótol, amint az „Egészség” újra be van kapcsolva.",
+  // --- all sets to failure, per-set progression ---
+  "All sets to failure": "Minden sorozat izomkudarcig",
+  "Every set goes until nothing is left, and each set moves on its own: more reps, then more weight.": "Minden sorozat addig tart, amíg semmi nem marad, és mindegyik külön halad: több ismétlés, aztán több súly.",
+  "Plan every set as an all-out one.": "Tervezz minden sorozatot teljes erővel.",
+  "Each set on its own: more reps until it reaches {0}, then more weight.": "Minden sorozat külön: több ismétlés {0}-ig, aztán több súly.",
+  "A set stuck for {0} sessions goes lighter. The other sets move on their own.": "{0} edzés óta elakadt sorozat könnyebb lesz. A többi külön halad.",
+  "Sets progress": "Sorozatok haladása",
+  "Each set on its own": "Minden sorozat külön",
+  "A set that reached its reps goes up. The others keep building at their own weight.": "Amelyik sorozat elérte az ismétléseit, nehezebb lesz. A többi a saját súlyán épül tovább.",
+  "All together": "Mind együtt",
+  "All sets share one weight and go up when every set made its reps.": "Minden sorozat egy súllyal megy, és akkor nő, ha minden sorozat elérte az ismétléseit.",
 }

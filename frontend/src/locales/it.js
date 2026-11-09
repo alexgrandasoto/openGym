@@ -3655,4 +3655,15 @@ export default {
   "Your webhooks stop sending while Integrations is off. They stay set up.": "I tuoi webhook smettono di inviare mentre «Integrazioni» è disattivato. Restano configurati.",
   "{0} of {1} modules on.": "{0} moduli attivi su {1}.",
   "{0} stops syncing while Health is off. Nothing is disconnected, and it catches up once Health is back.": "{0} smette di sincronizzare mentre «Salute» è disattivato. Non si scollega niente e recupera tutto quando «Salute» torna attivo.",
+  // --- all sets to failure, per-set progression ---
+  "All sets to failure": "Tutte le serie a cedimento",
+  "Every set goes until nothing is left, and each set moves on its own: more reps, then more weight.": "Ogni serie va avanti finché non resta niente, e ogni serie progredisce per conto suo: più ripetizioni, poi più peso.",
+  "Plan every set as an all-out one.": "Pianifica ogni serie a tutta.",
+  "Each set on its own: more reps until it reaches {0}, then more weight.": "Ogni serie per conto suo: più ripetizioni fino a {0}, poi più peso.",
+  "A set stuck for {0} sessions goes lighter. The other sets move on their own.": "Una serie ferma da {0} sedute si alleggerisce. Le altre progrediscono per conto loro.",
+  "Sets progress": "Progressione delle serie",
+  "Each set on its own": "Ogni serie per conto suo",
+  "A set that reached its reps goes up. The others keep building at their own weight.": "Una serie che arriva alle sue ripetizioni sale di peso. Le altre continuano a crescere con il loro peso.",
+  "All together": "Tutte insieme",
+  "All sets share one weight and go up when every set made its reps.": "Tutte le serie con lo stesso peso, che sale quando ogni serie ha fatto le sue ripetizioni.",
 }

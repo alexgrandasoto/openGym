@@ -361,7 +361,104 @@ export function entryRoutineId(w, en) {
 // The entry for one exercise in one saved workout. With a routine id it is that routine's own
 // entry — a combined A+B day can hold the same exercise twice, and the second one is not the
 // first one's history. Without, the first one, as it always was.
-const entryIn = (w, exId, rid) => (w.entries || []).find(e => e && e.id === exId && (!rid || entryRoutineId(w, e) === rid))
+const entryIn = (S, w, exId, rid) => (w.entries || []).find(e => e && e.id === exId && (!rid || sessionRoutineId(S, w, e) === rid))
+
+// "Push (Copy)" / "Push (Kopie 2)": the noun each language uses for copyRoutine's suffix.
+// A copy made before `copiedFrom` was stored is recognised by this. Keep it in step with the
+// 'Copy' string in every locale pack.
+const COPY_SUFFIXES = ['Copy', '副本', 'สำเนา', '복사본', 'কপি করুন', 'कॉपी', 'نسخ', 'Kopya', 'Másolat', 'Kopiera', 'Kopia', 'Копія', 'Копия', 'Cópia', 'Copia', 'Copie', 'Kopie']
+const COPY_NAME = new RegExp('^(.*) \\((?:' + COPY_SUFFIXES.map(s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')(?: (\\d+))?\\)$')
+const routineNameKey = s => String(s || '').trim().toLowerCase().replace(/\s+/g, ' ')
+
+// The openGym routine an imported workout belongs to, when the workout itself names none.
+// Hevy sends the routine id the session was started from (`hevyRoutineId`, matched to the
+// routine's `hevyId`). A CSV or an import from before that field was kept is matched by name,
+// and only when one routine has that name: two "Push" days must not share one line.
+function importedRoutineId(S, w) {
+  if (!w) return null
+  if ([].concat(w.routineIds || []).filter(Boolean).length || w.routineId) return null
+  const routines = (S?.routines || []).filter(r => r && r.id)
+  const hevy = typeof w.hevyRoutineId === 'string' ? w.hevyRoutineId : ''
+  if (hevy) {
+    const hits = routines.filter(r => r.hevyId === hevy)
+    if (hits.length === 1) return hits[0].id
+  }
+  const key = routineNameKey(w.name)
+  if (!key || key === 'imported') return null
+  const hits = routines.filter(r => routineNameKey(r.name) === key)
+  if (hits.length === 1) return hits[0].id
+  if (hits.length > 1) return null
+  // The original was removed and only "Push (Copy)" remains: the imported sessions are still named Push.
+  const copies = routines.filter(r => {
+    const m = COPY_NAME.exec(r.name || '')
+    return m && routineNameKey(m[1]) === key
+  })
+  return copies.length === 1 ? copies[0].id : null
+}
+
+/**
+ * Which routine a saved entry counts for. The id stored on it, or — for a workout brought in
+ * from another app with no routine of its own — the imported routine it was performed from.
+ * An exercise added beside a planned block stays unattached: some entries of that workout
+ * already name a routine, and this one does not.
+ */
+export function sessionRoutineId(S, w, en) {
+  const slot = entryRoutineId(w, en)
+  if (slot) return slot
+  if ((w?.entries || []).some(e => e && e.rid)) return null
+  return importedRoutineId(S, w)
+}
+
+// Sets and reps only, the part of a plan an edit restarts progression over (progression.js
+// plannedOf / planChanged). Weight is left out on purpose: history decides it.
+function slotPlan(cfg) {
+  if (!cfg) return null
+  const mode = modeOf(cfg)
+  const out = { sets: Math.max(1, cfg.sets || 1) }
+  if (mode === 'reps' && cfg.reps > 0) out.reps = cfg.reps
+  if (mode === 'reps' && cfg.repsMin > 0) out.repsMin = cfg.repsMin
+  if (mode === 'time' && cfg.sec > 0) out.sec = cfg.sec
+  if (mode === 'reps' && cfg.setsMax > 0) out.setsMax = cfg.setsMax
+  return out
+}
+const SLOT_PLAN_KEYS = ['sets', 'reps', 'repsMin', 'sec', 'setsMax']
+const slotPlansMatch = (a, b) => !!a && !!b && SLOT_PLAN_KEYS.every(k => (a[k] ?? null) === (b[k] ?? null))
+const exerciseCfg = (S, rid, exId) => (S?.routines || []).find(r => r && r.id === rid)?.ex?.find(e => e && e.id === exId) || null
+
+// The routine a copy was made from: the id copyRoutine stores, or the name it was given
+// ("Push (Copy)", "Push (Copy 2)") when that id was not stored yet. Null when nothing matches.
+function copyParentId(S, rid) {
+  const routine = (S?.routines || []).find(r => r && r.id === rid)
+  if (!routine) return null
+  if (routine.copiedFrom && (S.routines || []).some(r => r && r.id === routine.copiedFrom)) return routine.copiedFrom
+  const m = COPY_NAME.exec(routine.name || '')
+  if (!m) return null
+  const hits = (S.routines || []).filter(r => r && r.id !== rid && r.name === m[1])
+  return hits.length === 1 ? hits[0].id : null
+}
+
+/**
+ * The routine id whose sessions to read for this slot. Its own, when it has any. A copy whose
+ * sets and reps are still the source's reads the source, so "Push (Copy)" keeps telling you to
+ * add or drop weight. An edited copy does not: its numbers were not what those sessions hit.
+ */
+export function routineHistoryId(S, rid, exId) {
+  if (!rid || lastAcrossRoutines(S)) return rid || null
+  if (lastEntryIn(S, exId, rid)) return rid
+  const plan = slotPlan(exerciseCfg(S, rid, exId))
+  if (!plan) return rid
+  const seen = new Set([rid])
+  let id = rid
+  while (seen.size < 8) {
+    const next = copyParentId(S, id)
+    if (!next || seen.has(next)) break
+    seen.add(next)
+    if (!slotPlansMatch(plan, slotPlan(exerciseCfg(S, next, exId)))) break
+    if (lastEntryIn(S, exId, next)) return next
+    id = next
+  }
+  return rid
+}
 
 /**
  * Whether "last time" is the exercise's last session in any workout rather than in the routine
@@ -383,8 +480,11 @@ export const lastAcrossRoutines = S => S?.lastFrom === 'any'
  */
 export function lastEntryFor(S, exId, rid) {
   if (rid && !lastAcrossRoutines(S)) {
-    const own = lastEntryIn(S, exId, rid)
-    if (own) return own
+    // A copy with the same plan reads the routine it was copied from (routineHistoryId) and
+    // the result is tagged with this routine, so it is not "the first time in this routine".
+    const read = routineHistoryId(S, rid, exId)
+    const own = lastEntryIn(S, exId, read)
+    if (own) return read === rid ? own : { ...own, rid }
   }
   return lastEntryIn(S, exId, null)
 }
@@ -393,7 +493,7 @@ function lastEntryIn(S, exId, rid) {
   const workouts = S.workouts || []
   for (let i = workouts.length - 1; i >= 0; i--) {
     const w = workouts[i]
-    const en = entryIn(w, exId, rid)
+    const en = entryIn(S, w, exId, rid)
     if (!en) continue
     // A session that does not count — a planned deload, or a rehab block merged into a real
     // session — is not "last time" for the next regular prescription: its reps and durations
@@ -410,7 +510,7 @@ function lastEntryIn(S, exId, rid) {
     // progression engine can read a session back the way it was logged. Older workouts have
     // none — modeOf() falls back to the body part for them, which is what they were.
     if (done.length) {
-      const slot = entryRoutineId(w, en)
+      const slot = sessionRoutineId(S, w, en)
       // The entry's warm-up rows ride along (done or not — a warm-up that was in the finished
       // session is one the lifter set up) so "start from your last session" can carry them
       // over. `sets` stays work-only: every existing caller reads what it always read.
@@ -702,7 +802,11 @@ export function applyIntensifierPlan(sets, cfg, grid) {
  * the step every way of building an exercise's rows ends with, so none of them can forget it.
  */
 export function applyFailurePlan(sets, cfg) {
-  if (!cfg || cfg.lastToFailure !== true || modeOf(cfg) === 'cardio') return sets
+  if (!cfg || modeOf(cfg) === 'cardio') return sets
+  // "All sets to failure" (`cfg.allToFailure`): every work row, and progression reads each set
+  // on its own (progression.js perSetOf).
+  if (cfg.allToFailure === true) return sets.map(s => (!isWarmupRow(s) && !s.done ? { ...s, failure: true } : s))
+  if (cfg.lastToFailure !== true) return sets
   let last = -1
   sets.forEach((s, i) => { if (!isWarmupRow(s)) last = i })
   // A timed per-side hold is an L row and an R row that read as one set: both halves are the set.

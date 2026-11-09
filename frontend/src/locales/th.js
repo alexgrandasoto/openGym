@@ -3666,4 +3666,15 @@ export default {
   "Your webhooks stop sending while Integrations is off. They stay set up.": "เว็บฮุกจะหยุดส่งระหว่างที่ \"การเชื่อมต่อ\" ปิดอยู่ แต่ยังตั้งค่าไว้เหมือนเดิม",
   "{0} of {1} modules on.": "เปิดอยู่ {0} จาก {1} โมดูล",
   "{0} stops syncing while Health is off. Nothing is disconnected, and it catches up once Health is back.": "{0} จะหยุดซิงก์ระหว่างที่ \"สุขภาพ\" ปิดอยู่ ไม่มีอะไรถูกตัดการเชื่อมต่อ และจะตามทันเมื่อเปิด \"สุขภาพ\" อีกครั้ง",
+  // --- all sets to failure, per-set progression ---
+  "All sets to failure": "ทุกเซตจนหมดแรง",
+  "Every set goes until nothing is left, and each set moves on its own: more reps, then more weight.": "ทุกเซตเล่นจนไม่เหลือแรง และแต่ละเซตพัฒนาแยกกัน: เพิ่มครั้งก่อน แล้วค่อยเพิ่มน้ำหนัก",
+  "Plan every set as an all-out one.": "วางแผนให้ทุกเซตเป็นเซตเต็มแรง",
+  "Each set on its own: more reps until it reaches {0}, then more weight.": "แต่ละเซตแยกกัน: เพิ่มครั้งจนถึง {0} แล้วค่อยเพิ่มน้ำหนัก",
+  "A set stuck for {0} sessions goes lighter. The other sets move on their own.": "เซตที่ติดอยู่ {0} เซสชันจะเบาลง เซตอื่นพัฒนาแยกกัน",
+  "Sets progress": "ความก้าวหน้าของเซ็ต",
+  "Each set on its own": "แต่ละเซ็ตแยกกัน",
+  "A set that reached its reps goes up. The others keep building at their own weight.": "เซ็ตที่ทำครบจำนวนครั้งจะเพิ่มน้ำหนัก เซ็ตอื่นค่อยๆ พัฒนาที่น้ำหนักของตัวเอง",
+  "All together": "ทุกเซ็ตพร้อมกัน",
+  "All sets share one weight and go up when every set made its reps.": "ทุกเซ็ตใช้น้ำหนักเดียวกัน และเพิ่มเมื่อทุกเซ็ตทำครบจำนวนครั้ง",
 }

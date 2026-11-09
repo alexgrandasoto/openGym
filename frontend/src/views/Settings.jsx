@@ -60,7 +60,7 @@ import { usePasskeys, PasskeysRow, DeviceLinkRow, openDeviceLinkRedeem, PairShee
 import { DeleteAccountRow } from '../components/DeleteAccount.jsx'
 import { warmupAutoOf } from '../lib/warmup-ramp.js'
 import { Section, Row, SelectRow, Switch, Segmented, Button, TextField, SearchField } from '../components/ui.jsx'
-import { POLICIES_FOR, POLICY_NAME, POLICY_DESC, profileRule } from '../lib/progression.js'
+import { POLICIES_FOR, POLICY_NAME, POLICY_DESC, profileRule, setsMoveTogether } from '../lib/progression.js'
 import { PAGES, ROOT_GROUPS, pageVisible, searchSettings, pageTrail } from './settings-pages.js'
 import { platformNow } from '../lib/platform-now.js'
 import { pathBefore } from '../lib/nav.js'
@@ -667,6 +667,14 @@ export default function Settings({ page = null, find = null, via = null, entryKe
           <SelectRow icon="chartLine" iconTint="var(--blue)" title={t('Default progression')}
             value={profileRule(S)} onChange={v => update(s => { s.progDefault = v })}
             options={POLICIES_FOR.reps.map(p => ({ value: p, label: t(POLICY_NAME[p]), subtitle: t(POLICY_DESC[p]) }))} />
+          {/* Whether linear and double progression move each set on its own or all sets as one
+              (lib/progression.js perSetOf). Absent reads as each set on its own. */}
+          <SelectRow icon="list" iconTint="var(--purple)" title={t('Sets progress')}
+            value={setsMoveTogether(S) ? 'together' : 'each'} onChange={v => update(s => { s.setsMove = v })}
+            options={[
+              { value: 'each', label: t('Each set on its own'), subtitle: t('A set that reached its reps goes up. The others keep building at their own weight.') },
+              { value: 'together', label: t('All together'), subtitle: t('All sets share one weight and go up when every set made its reps.') },
+            ]} />
           {/* Whose reps a planned session opens with (lib/session-start.js). The plan's by default:
               the routine is what you said you would do, and history and progression decide the
               weight. The other choice is the old behaviour, reps carried over from last time, and

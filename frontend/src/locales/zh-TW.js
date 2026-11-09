@@ -3648,4 +3648,15 @@ export default {
   "Your webhooks stop sending while Integrations is off. They stay set up.": "「整合」關閉期間，你的 Webhook 不會傳送。設定仍會保留。",
   "{0} of {1} modules on.": "已開啟 {0}/{1} 個模組。",
   "{0} stops syncing while Health is off. Nothing is disconnected, and it catches up once Health is back.": "「健康」關閉期間，{0} 會停止同步。不會中斷任何連線，「健康」重新開啟後會自動補上。",
+  // --- all sets to failure, per-set progression ---
+  "All sets to failure": "所有組做到力竭",
+  "Every set goes until nothing is left, and each set moves on its own: more reps, then more weight.": "每組都做到一點不剩，每組各自進步：先加次數，再加重量。",
+  "Plan every set as an all-out one.": "把每組都規劃成全力組。",
+  "Each set on its own: more reps until it reaches {0}, then more weight.": "每組各自進步：次數加到 {0}，再加重量。",
+  "A set stuck for {0} sessions goes lighter. The other sets move on their own.": "連續 {0} 次訓練停滯的那組會減輕重量。其他組各自進步。",
+  "Sets progress": "組的進步方式",
+  "Each set on its own": "每組各自進步",
+  "A set that reached its reps goes up. The others keep building at their own weight.": "達到次數的那組加重量。其他組繼續用自己的重量累積。",
+  "All together": "所有組一起",
+  "All sets share one weight and go up when every set made its reps.": "所有組用同一個重量，每組都達到次數後再加重。",
 }

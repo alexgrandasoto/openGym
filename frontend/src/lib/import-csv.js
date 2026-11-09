@@ -1160,6 +1160,13 @@ export function mergeImport(S, parsed) {
     return res
   }
   const have = new Set(S.workouts.map(w => w.d))
+  // A later import of the same Hevy workouts can name the routine they were started from.
+  // The day is already here, so the session is not added again; only the missing link is filled in.
+  const byId = new Map(S.workouts.filter(w => w && w.id).map(w => [w.id, w]))
+  for (const w of parsed.workouts || []) {
+    const prev = w && byId.get(w.id)
+    if (prev && w.hevyRoutineId && !prev.hevyRoutineId) prev.hevyRoutineId = w.hevyRoutineId
+  }
   // Every parse invents fresh ids for the names it cannot match, and a later export of the same
   // account names those exercises again. So a custom exercise is looked up by name among the ones
   // already here — from an earlier import or made by hand — and the new days are pointed at it,

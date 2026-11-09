@@ -70,6 +70,20 @@ describe('exercise settings: last set to failure', () => {
     expect(rowNamed(host, 'Last set to failure')).toBeUndefined()
   })
 
+  it('"All sets to failure" saves its flag, replaces the last-set switch and drops back-off sets', () => {
+    const onSave = vi.fn()
+    const host = open({ backoff: true }, onSave)
+    expect(rowNamed(host, 'All sets to failure').querySelector('[role="switch"]').getAttribute('aria-checked')).toBe('false')
+    act(() => rowNamed(host, 'All sets to failure').querySelector('[role="switch"]').click())
+    expect(host.textContent).toContain('each set moves on its own')
+    expect(rowNamed(host, 'Last set to failure')).toBeUndefined()
+    expect(rowNamed(host, 'Back-off sets')).toBeUndefined()
+    save(host)
+    expect(onSave.mock.calls[0][0].allToFailure).toBe(true)
+    expect('backoff' in onSave.mock.calls[0][0]).toBe(false)
+    expect('lastToFailure' in onSave.mock.calls[0][0]).toBe(false)
+  })
+
   it('the finish summary line marks a failure set', () => {
     expect(setsLine([{ w: 60, r: 5 }, { w: 60, r: 9, f: true }], 'kg')).toBe('60 kg × 5, 9 F')
     expect(setsLine([{ w: 60, r: 5 }, { w: 65, r: 4, f: true }], 'kg')).toBe('60×5 · 65×4 F')

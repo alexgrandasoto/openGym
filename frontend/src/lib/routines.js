@@ -14,6 +14,12 @@ import { isRungRow } from './warmup-snap.js'
 export function copyRoutine(routine, suffix = 'Copy') {
   const copy = structuredClone(routine)
   copy.id = uid()
+  // Progress stays with the source until this copy's sets or reps change (history.js
+  // routineHistoryId). The source keeps the import identity: a second Hevy import must
+  // update the original, not this copy.
+  copy.copiedFrom = routine.id
+  delete copy.hevyId
+  delete copy.importKey
   // "Push (Copy)" copied again becomes "Push (Copy 2)", not "Push (Copy) (Copy)".
   const esc = suffix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
   const m = new RegExp('^(.*) \\(' + esc + '(?: (\\d+))?\\)$').exec(routine.name || '')

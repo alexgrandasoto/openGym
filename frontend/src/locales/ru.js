@@ -3659,4 +3659,15 @@ export default {
   "Your webhooks stop sending while Integrations is off. They stay set up.": "Пока «Интеграции» выключены, твои вебхуки ничего не отправляют. Они остаются настроенными.",
   "{0} of {1} modules on.": "Включено модулей: {0} из {1}.",
   "{0} stops syncing while Health is off. Nothing is disconnected, and it catches up once Health is back.": "Пока «Здоровье» выключено, {0} не синхронизируется. Ничего не отключается, и всё догонится, когда «Здоровье» вернётся.",
+  // --- all sets to failure, per-set progression ---
+  "All sets to failure": "Все подходы до отказа",
+  "Every set goes until nothing is left, and each set moves on its own: more reps, then more weight.": "Каждый подход до полного отказа, и каждый растёт сам по себе: больше повторений, потом больше веса.",
+  "Plan every set as an all-out one.": "Планируй каждый подход на максимум.",
+  "Each set on its own: more reps until it reaches {0}, then more weight.": "Каждый подход сам по себе: больше повторений, пока не дойдёт до {0}, потом больше веса.",
+  "A set stuck for {0} sessions goes lighter. The other sets move on their own.": "Подход без прогресса уже столько тренировок подряд: {0}. Он становится легче, остальные растут сами по себе.",
+  "Sets progress": "Прогресс подходов",
+  "Each set on its own": "Каждый подход отдельно",
+  "A set that reached its reps goes up. The others keep building at their own weight.": "Подход, который дошёл до своих повторений, становится тяжелее. Остальные растут на своём весе.",
+  "All together": "Все вместе",
+  "All sets share one weight and go up when every set made its reps.": "Все подходы с одним весом, который растёт, когда каждый подход выполнил свои повторения.",
 }

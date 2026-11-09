@@ -16,12 +16,12 @@
 //   · fewer sets than prescribed                       → miss
 // So a session that fell apart can never advance the load as though it had succeeded.
 
-import { modeOf, repStep, rerampWarmups, isBw, isPerSide, entryExcluded, entryRoutineId, lastAcrossRoutines } from './history.js'
+import { modeOf, repStep, rerampWarmups, isBw, isPerSide, entryExcluded, sessionRoutineId, routineHistoryId, lastAcrossRoutines } from './history.js'
 import { EXIDX, isAssisted, isLoadedEq, defaultIncrement } from './exercises.js'
 import { isWarmupRow, isSideSet, syncSideAggregate, makeSideSet } from './workout-model.js'
 import { normalizeRepRange } from './rep-range.js'
 import { isPyramid } from './pyramid.js'
-import { backoffAt } from './backoff.js'
+import { backoffAt, isBackoff } from './backoff.js'
 import { ownedWeightsFor, ownedKindFor, ownedUp, ownedDeload, ownedAround } from './dumbbells.js'
 
 export const POLICIES = ['off', 'linear', 'greyskull', 'double', 'triple', 'time']
@@ -317,6 +317,10 @@ export function readSession(entry, fallback) {
   return {
     mode, target, goal, reps,
     weight: loadOf(entry, sets),
+    // Each set's own load, beside `reps`: "All sets to failure" progresses every set on its own.
+    loads: sets.map(s => (s.done ? Number(s.w) || 0 : 0)),
+    // Every set done was marked as taken to failure, so a later set never had more in it.
+    toFailure: sets.some(s => s.done) && sets.every(s => !s.done || s.failure === true),
     count: reps.length,                                   // the dimension bodyweight work grows (#33)
     low: reps.length ? Math.min(...reps) : 0,
     amrap: reps.length ? reps[reps.length - 1] : 0,       // Greyskull's final set
@@ -329,16 +333,19 @@ export function readSession(entry, fallback) {
  *
  * With a routine id, the sessions that routine trained (issue #216): a heavy day and a light day
  * of the same lift each progress on their own line, and a combined day that holds the lift twice
- * is read by the entry that belongs to the routine, not by whichever comes first. A routine with
- * no session of its own reads the exercise's whole history instead, so a new or copied routine
- * continues from where you are. Each session carries the routine it came from (`rid`) and the
- * plan it was built from (`planned`), so the caller can tell a borrowed or outdated baseline.
+ * is read by the entry that belongs to the routine, not by whichever comes first. A workout
+ * imported from another app counts as the routine it was performed from (same name, or Hevy's
+ * routine id), so the next session can still say to add or drop weight. A copy with the same
+ * sets and reps reads the routine it was copied from. Anything else with no session of its own
+ * reads the exercise's whole history. Each session carries the routine it came from (`rid`) and
+ * the plan it was built from (`planned`), so the caller can tell a borrowed or outdated baseline.
  * "Last time means → Any workout" (#770) reads the whole history as one line, routine or not.
  */
 export function sessionsFor(S, exId, fallback, rid) {
   if (rid && !lastAcrossRoutines(S)) {
-    const own = sessionsIn(S, exId, fallback, rid)
-    if (own.length) return own
+    const read = routineHistoryId(S, rid, exId)
+    const own = sessionsIn(S, exId, fallback, read)
+    if (own.length) return read === rid ? own : own.map(s => ({ ...s, rid }))
   }
   return sessionsIn(S, exId, fallback, null)
 }
@@ -346,7 +353,7 @@ export function sessionsFor(S, exId, fallback, rid) {
 function sessionsIn(S, exId, fallback, rid) {
   const out = []
   ;(S.workouts || []).forEach(w => {
-    const entry = (w.entries || []).find(e => e && e.id === exId && (!rid || entryRoutineId(w, e) === rid))
+    const entry = (w.entries || []).find(e => e && e.id === exId && (!rid || sessionRoutineId(S, w, e) === rid))
     if (!entry) return
     // A session that does not count for this exercise cannot become the baseline for its next
     // prescription. Exclusion is per-entry now (ENG-11): a legacy whole-workout
@@ -355,7 +362,7 @@ function sessionsIn(S, exId, fallback, rid) {
     // never rewrite it. This is the only progression-exclusion path in the file.
     if (entryExcluded(w, entry)) return
     if (!entry.sets.some(s => s.done && !isWarmupRow(s))) return
-    const slot = entryRoutineId(w, entry)
+    const slot = sessionRoutineId(S, w, entry)
     out.push({ d: w.d, ...(slot ? { rid: slot } : {}), ...(entry.planned ? { planned: entry.planned } : {}), ...readSession(entry, fallback) })
   })
   return out
@@ -436,6 +443,79 @@ export function stallCount(sessions, policy) {
     n++ // increment stall count when no escape conditions were met
   }
   return n
+}
+
+// --- sets that progress on their own -----------------------------------------------------------
+//
+// Every set is its own line: set 2 at 27.5 × 8 does not wait for set 1 to reach the top of the
+// range. The profile's "Sets progress" (`S.setsMove`) is 'each' unless the lifter picked
+// 'together', the old way where all sets share one weight; `cfg.allToFailure` always moves them
+// one by one. Linear and double progression only; the others already plan each set (triple, a
+// pyramid) or move the sets together on purpose (Greyskull, back-off sets).
+export const PER_SET_POLICIES = ['linear', 'double']
+export const setsMoveTogether = S => S?.setsMove === 'together'
+export function perSetOf(cfg, policy, mode, S) {
+  return !!cfg && (cfg.allToFailure === true || !setsMoveTogether(S))
+    && mode === 'reps' && PER_SET_POLICIES.includes(policy)
+    && !isBackoff(cfg) && !isPyramid(cfg) && cfg.intensifier?.type !== 'restpause'
+}
+
+// How many sessions in a row set `k` stood still at its weight: short of the top of the range,
+// and no more reps than it managed at that weight before. The first session at a weight counts
+// only when it fell under the bottom of the range, so a raise is not the start of a stall.
+export function setStallCount(sessions, k, range) {
+  let n = 0
+  for (let i = sessions.length - 1; i >= 0; i--) {
+    const w = sessions[i].loads?.[k]
+    const r = sessions[i].reps?.[k] || 0
+    if (!(w > 0)) break
+    if (i < sessions.length - 1 && w !== sessions[i + 1].loads?.[k]) break
+    if (r >= range.reps) break
+    const before = []
+    for (let j = i - 1; j >= 0 && sessions[j].loads?.[k] === w; j--) before.push(sessions[j].reps?.[k] || 0)
+    if (before.length ? r > Math.max(...before) : r >= range.repsMin) break
+    n++
+  }
+  return n
+}
+
+// Sets taken to failure only get harder to do: a later set is never asked for a heavier weight
+// than the set before it, nor for more reps at the same weight.
+function capToSetBefore(rows) {
+  for (let k = 1; k < rows.length; k++) {
+    const prev = rows[k - 1]
+    const row = rows[k]
+    if (row.weight > prev.weight) rows[k] = { weight: prev.weight, reps: prev.reps, kind: 'hold' }
+    else if (row.weight === prev.weight && row.reps > prev.reps) rows[k] = { ...row, reps: prev.reps }
+  }
+  return rows
+}
+
+function perSetPrescription(sessions, n, range, { policy, deloadAt, step, harder, easier, topped, toFailure }) {
+  const last = sessions[sessions.length - 1]
+  const rows = []
+  for (let k = 0; k < n; k++) {
+    const w = last.loads?.[k] > 0 ? last.loads[k] : 0
+    const r = last.reps?.[k] || 0
+    // A set not done last time, or one more than last time had, opens where the set before it does.
+    if (!(w > 0)) { rows.push({ ...(rows[k - 1] || { weight: last.weight, reps: range.repsMin, kind: 'hold' }), kind: 'hold' }); continue }
+    if (r >= range.reps) {
+      rows.push(topped(w) ? { weight: w, reps: range.reps, kind: 'hold' } : { weight: harder(w), reps: range.repsMin, kind: 'up' })
+      continue
+    }
+    if (setStallCount(sessions, k, range) >= deloadAt) { rows.push({ weight: easier(w), reps: range.repsMin, kind: 'deload' }); continue }
+    rows.push({ weight: w, reps: Math.min(range.reps, Math.max(range.repsMin, r + step)), kind: 'hold' })
+  }
+  if (toFailure) capToSetBefore(rows)
+  const kind = rows.some(x => x.kind === 'deload') ? 'deload' : rows.some(x => x.kind === 'up') ? 'up' : 'hold'
+  return {
+    policy, kind, perSet: true,
+    weight: rows[0].weight, reps: rows[0].reps,
+    rowReps: rows.map(x => x.reps), rowWeights: rows.map(x => x.weight),
+    why: kind === 'deload'
+      ? ['A set stuck for {0} sessions goes lighter. The other sets move on their own.', deloadAt]
+      : ['Each set on its own: more reps until it reaches {0}, then more weight.', range.reps],
+  }
 }
 
 /**
@@ -536,8 +616,30 @@ export function nextPrescription(S, cfg, routine) {
     return { policy, kind: 'hold', ...held, reps: cfg.reps || undefined, why }
   }
 
-  const stalls = stallCount(sessions, policy)
   const deloadAt = DELOAD_AFTER[policy] || 3
+  // Sets that progress on their own: one weight and one rep goal for all of them asks a later
+  // set for what only the first could do. Each set is read on its own instead, from the same set
+  // last time: under its top reps it aims one rep higher at the same weight, at the top it goes
+  // up a step and back to the bottom of the range. When last time's sets shared one weight and
+  // every set lands on the same next step, that is what the rules below say too, with their
+  // own reasons, so they answer. A session with more sets than the plan (an import worked up to
+  // its top set) has no set to match each row to, so it is read whole below.
+  const nSets = Math.max(1, cfg.sets || 1)
+  if (perSetOf(cfg, policy, mode, S) && last.weight > 0 && (last.loads?.length || 0) <= nSets) {
+    const range = policy === 'double'
+      ? normalizeRepRange(cfg.reps || last.goal || 10, cfg.repsMin, repStep(cfg))
+      : { reps: cfg.reps || last.goal || 5, repsMin: cfg.reps || last.goal || 5 }
+    const p = perSetPrescription(sessions, nSets, range, {
+      policy, unit, deloadAt, step: repStep(cfg), harder: w => harder(w, inc), easier, topped,
+      toFailure: cfg.allToFailure === true || !!last.toFailure,
+    })
+    const loads = (last.loads || []).filter(w => w > 0)
+    const sameLoad = loads.every(w => w === loads[0])
+    const sameNext = p.rowWeights.every(w => w === p.weight) && p.rowReps.every(r => r === p.reps)
+    if (!(sameLoad && sameNext)) return p
+  }
+
+  const stalls = stallCount(sessions, policy)
 
   if (mode === 'time') {
     if (last.ok) {
@@ -815,6 +917,19 @@ export function applyPrescription(sets, p, step = 2.5, floor = 0, assisted = fal
       out.push(isSideSet(seed) ? makeSideSet({
         w: p.weight ?? seed.w, r: p.reps ?? seed.r,
       }) : { ...plainSeed, done: false })
+    }
+  }
+  // Each set's own weight ("All sets to failure"), one per open work row in order.
+  if (Array.isArray(p.rowWeights)) {
+    let k = -1
+    for (let i = 0; i < out.length; i++) {
+      if (isWarmupRow(out[i])) continue
+      k++
+      const w = p.rowWeights[k]
+      if (out[i].done || w == null) continue
+      out[i] = isSideSet(out[i])
+        ? syncSideAggregate({ ...out[i], sides: Object.fromEntries(['L', 'R'].map(side => [side, out[i].sides[side].done ? out[i].sides[side] : { ...out[i].sides[side], w }])) })
+        : { ...out[i], w }
     }
   }
   // Triple progression's per-set aims, one per open work row in order (the rows grown above

@@ -2443,6 +2443,17 @@ export const PT_BR_OVERRIDES = {
   "Your watch stops getting workouts while Watch is off. It stays paired.": "Seu relógio para de receber treinos enquanto “Relógio” estiver desligado. Continua pareado.",
   "Your webhooks stop sending while Integrations is off. They stay set up.": "Seus webhooks param de enviar enquanto “Integrações” estiver desligado. Continuam configurados.",
   "{0} stops syncing while Health is off. Nothing is disconnected, and it catches up once Health is back.": "{0} para de sincronizar enquanto “Saúde” estiver desligado. Nada fica desconectado, e ele se atualiza quando “Saúde” voltar.",
+  // --- all sets to failure, per-set progression ---
+  "All sets to failure": "Todas as séries até a falha",
+  "Every set goes until nothing is left, and each set moves on its own: more reps, then more weight.": "Cada série vai até não sobrar nada, e cada uma progride sozinha: mais repetições, depois mais peso.",
+  "Plan every set as an all-out one.": "Planeje cada série no máximo.",
+  "Each set on its own: more reps until it reaches {0}, then more weight.": "Cada série sozinha: mais repetições até chegar a {0}, depois mais peso.",
+  "A set stuck for {0} sessions goes lighter. The other sets move on their own.": "Uma série parada há {0} sessões fica mais leve. As outras progridem sozinhas.",
+  "Sets progress": "Progressão das séries",
+  "Each set on its own": "Cada série sozinha",
+  "A set that reached its reps goes up. The others keep building at their own weight.": "Uma série que chegou às repetições sobe de peso. As outras continuam evoluindo com o próprio peso.",
+  "All together": "Todas juntas",
+  "All sets share one weight and go up when every set made its reps.": "Todas as séries com o mesmo peso, que sobe quando todas fazem as repetições.",
 }
 
 export default { ...pt, ...PT_BR_OVERRIDES }

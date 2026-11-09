@@ -120,6 +120,7 @@ function cleanEx(e) {
   if (isBackoff(e)) o.backoff = true
   // "Last set to failure" is how the exercise is prescribed too; only when on, never on cardio.
   if (e.lastToFailure === true && mode !== 'cardio') o.lastToFailure = true
+  if (e.allToFailure === true && mode === 'reps') o.allToFailure = true
   // Epley deload factor is a per-occurrence progression setting. Omit the default so older
   // exports remain compact and importing them preserves the default 90% behaviour.
   if (e.deloadFactor != null && Number(e.deloadFactor) !== 0.9) o.deloadFactor = e.deloadFactor
@@ -440,7 +441,8 @@ function schemeParts(e, unit, speedUnit) {
     return [sets > 1 ? `${sets} × ${body}` : body]
   }
   const line = exLine({ ...e, reps: e.reps ?? 10 }, unit, speedUnit)
-  const extras = [intensifierLine(e.intensifier), e.lastToFailure === true ? t('Last set to failure') : ''].filter(Boolean)
+  const failure = e.allToFailure === true && mode === 'reps' ? t('All sets to failure') : e.lastToFailure === true ? t('Last set to failure') : ''
+  const extras = [intensifierLine(e.intensifier), failure].filter(Boolean)
   return [line, ...extras]
 }
 // The extra lines keep their " · " in the text (hidden on paper), so copied text reads as one line.

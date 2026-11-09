@@ -3655,4 +3655,15 @@ export default {
   "Your webhooks stop sending while Integrations is off. They stay set up.": "\"इंटीग्रेशन\" बंद रहने तक आपके Webhook कुछ नहीं भेजते। वे सेट रहते हैं।",
   "{0} of {1} modules on.": "{1} में से {0} मॉड्यूल चालू।",
   "{0} stops syncing while Health is off. Nothing is disconnected, and it catches up once Health is back.": "\"सेहत\" बंद रहने तक {0} सिंक नहीं करता। कुछ भी डिस्कनेक्ट नहीं होता, और \"सेहत\" लौटते ही सब पकड़ लेता है।",
+  // --- all sets to failure, per-set progression ---
+  "All sets to failure": "सभी सेट फेलियर तक",
+  "Every set goes until nothing is left, and each set moves on its own: more reps, then more weight.": "हर सेट तब तक चलता है जब तक कुछ न बचे, और हर सेट अपने आप आगे बढ़ता है: पहले ज़्यादा रेप्स, फिर ज़्यादा वज़न।",
+  "Plan every set as an all-out one.": "हर सेट को पूरी ताकत वाला सेट मानकर प्लान करें।",
+  "Each set on its own: more reps until it reaches {0}, then more weight.": "हर सेट अपने आप: {0} तक पहुँचने तक ज़्यादा रेप्स, फिर ज़्यादा वज़न।",
+  "A set stuck for {0} sessions goes lighter. The other sets move on their own.": "{0} सेशन से अटका सेट हल्का होता है। बाकी सेट अपने आप आगे बढ़ते हैं।",
+  "Sets progress": "सेट की प्रगति",
+  "Each set on its own": "हर सेट अपने हिसाब से",
+  "A set that reached its reps goes up. The others keep building at their own weight.": "जो सेट अपने रेप्स तक पहुँचा, उसका वज़न बढ़ता है। बाकी अपने वज़न पर आगे बढ़ते रहते हैं।",
+  "All together": "सब एक साथ",
+  "All sets share one weight and go up when every set made its reps.": "सभी सेट एक ही वज़न पर, और हर सेट के रेप्स पूरे होने पर वज़न बढ़ता है।",
 }

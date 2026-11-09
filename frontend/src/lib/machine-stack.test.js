@@ -111,7 +111,7 @@ describe('progression over the stack', () => {
   })
 
   it('the Epley deload after three stalls lands on the stack', () => {
-    const S = state(['2026-10-01', '2026-10-03', '2026-10-05'].map(d => session(d, FLY, 31.7, [8, 5])))
+    const S = state(['2026-10-01', '2026-10-03', '2026-10-05'].map(d => session(d, FLY, 31.7, [8, 5])), { setsMove: 'together' })
     const p = nextPrescription(S, cfg(FLY), null)
     expect(p.kind).toBe('deload')
     expect(STACK).toContain(p.weight)

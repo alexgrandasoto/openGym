@@ -258,6 +258,11 @@ export const DEF = {
   // The rule of a reps exercise whose routine sets none (Settings → Fine-tuning, lib/progression.js
   // profileRule). Absent reads as 'linear' too, the way the app always behaved.
   progDefault: 'linear',
+  // How the sets of a linear or double progression move (Settings → Fine-tuning,
+  // lib/progression.js perSetOf): 'each' reads every set against the same set last time,
+  // 'together' gives them one weight that goes up once every set made its reps. Absent reads as
+  // 'each'. An exercise with "All sets to failure" always moves set by set.
+  setsMove: 'each',
   // Per-language choice for translated exercise names: whether the original English name is
   // shown in parentheses next to the translation. Map { '<lang>': boolean }; a missing key
   // (any profile written before this setting existed) reads as shown.

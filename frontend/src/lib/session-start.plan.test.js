@@ -6,6 +6,7 @@ import { describe, it, expect } from 'vitest'
 import { buildCombinedEntries } from './session-merge.js'
 import { buildSessionEntries } from './session-start.js'
 import { buildCompletedWorkout } from './finish-workout.js'
+import { copyRoutine } from './routines.js'
 import { POLICIES } from './progression.js'
 import { isWarmupRow } from './workout-model.js'
 
@@ -157,6 +158,22 @@ describe('a routine whose only history is freestyle or imported', () => {
     const [e] = start(st, ['A'])
     expect(work(e).map(s => [s.w, s.r])).toEqual([[30, 10], [30, 10]])
     expect(e.plan.why[0]).toBe('First time in this routine, so starting from its own target.')
+  })
+
+  it('raises or holds from the imported sessions of the routine it was copied from', () => {
+    const st = state([{ id: 'A', name: 'Push', hevyId: 'hv', ex: [{ id: BENCH, sets: 2, reps: 10, weight: 50, mode: 'reps' }] }])
+    st.workouts.push({ id: 'imp', d: '2026-09-01', routineId: null, name: 'Push', entries: [{ id: BENCH, sets: [{ w: 60, r: 10, done: true }, { w: 60, r: 10, done: true }] }] })
+    const copy = copyRoutine(st.routines[0])
+    st.routines.push(copy)
+    const [fromCopy] = buildSessionEntries(st, copy)
+    expect(fromCopy.plan.kind).toBe('up')
+    expect(work(fromCopy).map(s => [s.w, s.r])).toEqual([[62.5, 10], [62.5, 10]])
+    expect(fromCopy.plan.why[0]).toBe('Every rep last time. {0} {1} more.')
+    st.workouts[0].entries[0].sets = [{ w: 60, r: 6, done: true }, { w: 60, r: 6, done: true }]
+    const [held] = start(st, [copy.id])
+    expect(held.plan.kind).toBe('hold')
+    expect(held.plan.why[0]).toBe('Missed reps last time. Same weight again ({0} of {1} to go).')
+    expect(work(held).map(s => s.w)).toEqual([60, 60])
   })
 })
 

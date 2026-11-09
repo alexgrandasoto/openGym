@@ -82,7 +82,7 @@ describe('buildSessionEntries', () => {
   for (const [prog, kind, reps] of [['linear', 'up', [15, 15]], ['linear', 'hold', [15, 9]], ['greyskull', 'up', [15, 15]], ['greyskull', 'deload', [15, 9]]]) {
     it(`opens ${prog} ${kind} at the plan's reps, and completing the rows reads as a hit`, () => {
       const cfg = { id: '0025', sets: 2, reps: 10, weight: 40, prog }
-      const [entry] = buildSessionEntries(history(reps), { id: 'r', prog, ex: [cfg] })
+      const [entry] = buildSessionEntries(history(reps, { setsMove: 'together' }), { id: 'r', prog, ex: [cfg] })
       const work = entry.sets.filter(s => !isWarmupRow(s))
       expect(entry.plan.kind).toBe(kind)
       expect(entry.target.reps).toBe(10)
